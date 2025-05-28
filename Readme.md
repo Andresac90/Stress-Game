@@ -48,7 +48,7 @@ The player can use a grappling hook that is attached to the character’s left h
 
 There will be enemies in the game, the player can use a sword to combat them. The sword has two main attacks that can be combined to execute “combos”. **Light attack** and **heavy attack**
 
-![A drawing of a person holding a sword](Aspose.Words.image1.png)
+![A drawing of a person holding a sword](image1.png)
 
 *Image 1. Character Draft*
 
