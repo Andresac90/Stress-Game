@@ -452,6 +452,7 @@
 "Assets/Scripts/Player/Sounds/PlayFootstep.cs"
 "Assets/Scripts/Sound/PlaySoundEnter.cs"
 "Assets/Scripts/Sound/SoundManager.cs"
+"Assets/Scripts/UI/UIManager.cs"
 -langversion:9.0
 /deterministic
 /optimize+
