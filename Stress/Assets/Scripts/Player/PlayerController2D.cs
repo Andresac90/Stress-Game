@@ -143,12 +143,10 @@ public class PlayerController2D : MonoBehaviour
         transform.position += (Vector3)(velocity * Time.deltaTime);
 
         UpdateAnimation();
-        UpdateFootsteps(); // <-- play steps here
+        UpdateFootsteps(); // play steps here
     }
 
-    /// <summary>
-    /// Switch to a new state, ensuring proper exit/enter calls.
-    /// </summary>
+    /// <summary>Switch to a new state, ensuring proper exit/enter calls.</summary>
     public void SwitchState(IPlayerState next)
     {
         currentState?.ExitState();
@@ -174,21 +172,21 @@ public class PlayerController2D : MonoBehaviour
     }
 
     /// <summary>
-    /// Updates animator parameters and flips the sprite based on horizontal motion.
+    /// Updates animator parameters (normalized Speed 0..1) and flips the sprite.
     /// </summary>
     private void UpdateAnimation()
     {
         if (animator)
         {
-            // If you prefer normalized speed for a Blend Tree, replace with:
-            // float speedNorm = Mathf.Clamp01(velocity.magnitude / maxSpeed);
-            // animator.SetFloat(speedHash, speedNorm);
-            animator.SetFloat(speedHash, Mathf.Abs(velocity.x));
+            // Normalized speed for Blend Tree (works for 4-directional motion).
+            float speedNorm = Mathf.Clamp01(velocity.magnitude / Mathf.Max(0.001f, maxSpeed));
+            animator.SetFloat(speedHash, speedNorm);
             animator.SetBool(isGroundedHash, isGrounded);
         }
 
         if (spriteRenderer)
         {
+            // Flip only on horizontal movement to avoid flipping while moving vertically.
             if (velocity.x > 0.1f) spriteRenderer.flipX = false;
             else if (velocity.x < -0.1f) spriteRenderer.flipX = true;
         }
@@ -203,7 +201,7 @@ public class PlayerController2D : MonoBehaviour
         if (!isGrounded) { _footstepTimer = 0f; return; }
         if (currentState == grapplingState) { _footstepTimer = 0f; return; }
 
-        // Use total speed if you move in 4 directions; otherwise use Mathf.Abs(velocity.x)
+        // Use total speed (magnitude) for 4-direction movement
         float speedNorm = Mathf.Clamp01(velocity.magnitude / Mathf.Max(0.001f, maxSpeed));
         if (speedNorm < minSpeedForSteps)
         {
@@ -212,7 +210,11 @@ public class PlayerController2D : MonoBehaviour
         }
 
         // Interpolate cadence between walk and run
-        float interval = Mathf.Lerp(intervalAtMinSpeed, intervalAtMaxSpeed, Mathf.InverseLerp(minSpeedForSteps, 1f, speedNorm));
+        float interval = Mathf.Lerp(
+            intervalAtMinSpeed,
+            intervalAtMaxSpeed,
+            Mathf.InverseLerp(minSpeedForSteps, 1f, speedNorm)
+        );
 
         if (_footstepTimer <= 0f)
         {
@@ -225,9 +227,7 @@ public class PlayerController2D : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Positions and orients the hook origin from the pointer input.
-    /// </summary>
+    /// <summary>Positions and orients the hook origin from the pointer input.</summary>
     public void UpdatePointer()
     {
         if (!hookOrigin) return;
@@ -242,9 +242,7 @@ public class PlayerController2D : MonoBehaviour
         hookOrigin.position = (Vector2)transform.position + dir * pointerDistance;
     }
 
-    /// <summary>
-    /// Fires the hook if none is active; otherwise cancels the active hook.
-    /// </summary>
+    /// <summary>Fires the hook if none is active; otherwise cancels the active hook.</summary>
     public void ToggleGrapple()
     {
         if (currentHook == null)
@@ -266,9 +264,7 @@ public class PlayerController2D : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Hook callback when a surface is latched.
-    /// </summary>
+    /// <summary>Hook callback when a surface is latched.</summary>
     private void OnGrappleHit(Vector2 hitPoint)
     {
         grapplePoint = hitPoint;
