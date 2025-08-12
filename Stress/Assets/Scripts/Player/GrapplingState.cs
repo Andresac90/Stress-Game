@@ -1,11 +1,12 @@
 // GrapplingState.cs
 using UnityEngine;
 
+//Player is being pulled toward an active grapple point.
 public class GrapplingState : IPlayerState
 {
-    PlayerController2D player;
-    public void EnterState(PlayerController2D player) =>
-        this.player = player;
+    private PlayerController2D player;
+
+    public void EnterState(PlayerController2D player) => this.player = player;
 
     public void HandleInput()
     {
@@ -16,13 +17,17 @@ public class GrapplingState : IPlayerState
     public void LogicUpdate()
     {
         Vector2 toTarget = player.grapplePoint - (Vector2)player.transform.position;
-        float   dist     = toTarget.magnitude;
-        Vector2 dir      = toTarget / dist;
+        float dist = toTarget.magnitude;
+        if (dist > 0.001f)
+        {
+            Vector2 dir = toTarget / dist;
+            player.velocity = dir * player.hookPullSpeed;
+        }
 
-        player.velocity = dir * player.hookPullSpeed;
         player.UpdatePointer();
 
-        if (dist < 0.3f)
+        // Close enough? Auto-cancel (OnHookEnded restores locomotion)
+        if (dist < 0.3f && player.currentHook != null)
             player.ToggleGrapple();
     }
 

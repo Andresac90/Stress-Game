@@ -39,6 +39,18 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Parallax1
+    uniqueID: 3490213913
+    locked: 0
+  - name: Parallax2
+    uniqueID: 2117884817
+    locked: 0
+  - name: Parallax3
+    uniqueID: 2833733725
+    locked: 0
+  - name: Parallax4
+    uniqueID: 677603595
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

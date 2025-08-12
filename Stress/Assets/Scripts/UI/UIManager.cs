@@ -1,10 +1,12 @@
+// UIManager.cs
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
+//Simple UI bridge for menu buttons.
 public class UIManager : MonoBehaviour
 {
     public void StartGameButtonClicked()
     {
-        //Open the game scene
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Test_PlayerMovement");
+        SceneManager.LoadScene("Test_PlayerMovement");
     }
 }
