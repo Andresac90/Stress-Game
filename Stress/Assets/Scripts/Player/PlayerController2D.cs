@@ -2,10 +2,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-/// <summary>
-/// Central player controller handling 2D movement, jumping, grappling,
-/// basic animation parameters, respawning, and integrated footstep SFX.
-/// </summary>
+//Central player controller handling 2D movement, jumping, grappling,
+//basic animation parameters, respawning, and integrated footstep SFX.
 [DisallowMultipleComponent]
 public class PlayerController2D : MonoBehaviour
 {
@@ -77,20 +75,18 @@ public class PlayerController2D : MonoBehaviour
     private IPlayerState currentState;
 
     // --- Shared data used by states ---
-    [HideInInspector] public Vector2 velocity;        // Current velocity (units/sec)
+    [HideInInspector] public Vector2 velocity;        // Current velocity 
     [HideInInspector] public bool isGrounded;         // True when touching ground
     [HideInInspector] public Vector2 grapplePoint;    // Hook latch position
     [HideInInspector] public GrapplingHook2D currentHook; // Active hook instance
 
-    // --- Respawn support ---
-    private Vector3 startPosition;                    // Spawn point
+    private Vector3 startPosition; // Spawn point
 
     // --- Animator parameter hashes ---
     private int speedHash;
     private int isGroundedHash;
     public int jumpHash; // public so states can trigger it
 
-    // --- Footstep runtime ---
     private float _footstepTimer;
 
     void Awake()
@@ -104,7 +100,7 @@ public class PlayerController2D : MonoBehaviour
         if (!animator) TryGetComponent(out animator);
         if (!spriteRenderer) TryGetComponent(out spriteRenderer);
 
-        // Cache parameter ids (avoid string lookups every frame)
+        // Cache parameter ids
         speedHash = Animator.StringToHash("Speed");
         isGroundedHash = Animator.StringToHash("IsGrounded");
         jumpHash = Animator.StringToHash("Jump");
@@ -139,14 +135,13 @@ public class PlayerController2D : MonoBehaviour
         currentState.HandleInput();
         currentState.LogicUpdate();
 
-        // Integrate velocity (character controller style).
+        // Integrate velocity
         transform.position += (Vector3)(velocity * Time.deltaTime);
 
         UpdateAnimation();
-        UpdateFootsteps(); // play steps here
+        UpdateFootsteps(); // play sound steps
     }
 
-    /// <summary>Switch to a new state, ensuring proper exit/enter calls.</summary>
     public void SwitchState(IPlayerState next)
     {
         currentState?.ExitState();
@@ -154,10 +149,8 @@ public class PlayerController2D : MonoBehaviour
         currentState.EnterState(this);
     }
 
-    /// <summary>
-    /// Sets isGrounded via an overlap check. If grounded while falling,
-    /// snap vertical velocity to zero to avoid sticky accumulation.
-    /// </summary>
+    // Sets isGrounded via an overlap check. If grounded while falling,
+    // snap vertical velocity to zero to avoid sticky accumulation.
     private void CheckGround()
     {
         if (!groundCheck)
@@ -171,9 +164,7 @@ public class PlayerController2D : MonoBehaviour
             velocity.y = 0f;
     }
 
-    /// <summary>
-    /// Updates animator parameters (normalized Speed 0..1) and flips the sprite.
-    /// </summary>
+    //Updates animator parameters and flips the sprite.
     private void UpdateAnimation()
     {
         if (animator)
@@ -192,9 +183,7 @@ public class PlayerController2D : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Footstep cadence scaled by current speed. Plays only when grounded and not grappling.
-    /// </summary>
+    //Footstep cadence scaled by current speed. Plays only when grounded and not grappling.
     private void UpdateFootsteps()
     {
         if (!enableFootsteps) { _footstepTimer = 0f; return; }
@@ -227,7 +216,7 @@ public class PlayerController2D : MonoBehaviour
         }
     }
 
-    /// <summary>Positions and orients the hook origin from the pointer input.</summary>
+    // Positions and orients the hook origin from the pointer input
     public void UpdatePointer()
     {
         if (!hookOrigin) return;
@@ -242,7 +231,7 @@ public class PlayerController2D : MonoBehaviour
         hookOrigin.position = (Vector2)transform.position + dir * pointerDistance;
     }
 
-    /// <summary>Fires the hook if none is active; otherwise cancels the active hook.</summary>
+    //Fires the hook if none is active; otherwise cancels the active hook 
     public void ToggleGrapple()
     {
         if (currentHook == null)
@@ -250,31 +239,25 @@ public class PlayerController2D : MonoBehaviour
             var hook = HookPool.Instance.GetHook();
             hook.transform.position = hookOrigin ? hookOrigin.position : transform.position;
             hook.OnHookHit += OnGrappleHit;
-            hook.OnEnded += OnHookEnded; // track auto-cancel/end
+            hook.OnEnded += OnHookEnded; 
             hook.Initialize(hookOrigin ? (Vector2)hookOrigin.right : Vector2.right, hookSpeed, hookMaxDistance);
             currentHook = hook;
 
-            // Play immediately when firing (not on hit)
+            // Play immediately when firing
             SoundManager.PlaySound(SoundType.GRAPPLING_HOOK, 1f, SoundManager.SoundOverlap.Cut);
         }
         else
         {
-            // This will invoke OnHookEnded → cleanup + state restore.
             currentHook.Cancel();
         }
     }
 
-    /// <summary>Hook callback when a surface is latched.</summary>
     private void OnGrappleHit(Vector2 hitPoint)
     {
         grapplePoint = hitPoint;
         SwitchState(grapplingState);
     }
 
-    /// <summary>
-    /// Hook callback for any end-of-life (missed, exceeded distance, or cancel).
-    /// Ensures references are released and state returns to locomotion.
-    /// </summary>
     private void OnHookEnded()
     {
         if (currentHook != null)
@@ -288,7 +271,6 @@ public class PlayerController2D : MonoBehaviour
             SwitchState(isGrounded ? groundedState : airborneState);
     }
 
-    /// <summary>Teleports the player back to the original spawn point and resets state.</summary>
     public void Respawn()
     {
         transform.position = startPosition;
@@ -296,7 +278,6 @@ public class PlayerController2D : MonoBehaviour
         SwitchState(groundedState);
     }
 
-    /// <summary>Teleports the player to a specified spawn point and resets state.</summary>
     public void RespawnAt(Transform spawnTransform)
     {
         if (!spawnTransform) return;

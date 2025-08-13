@@ -26,7 +26,7 @@ public class GrapplingState : IPlayerState
 
         player.UpdatePointer();
 
-        // Close enough? Auto-cancel (OnHookEnded restores locomotion)
+        // Is it Close enough? Auto-cancel 
         if (dist < 0.3f && player.currentHook != null)
             player.ToggleGrapple();
     }

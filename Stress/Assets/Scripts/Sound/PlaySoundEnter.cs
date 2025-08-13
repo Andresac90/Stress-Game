@@ -1,10 +1,6 @@
 // PlayFootstep.cs
 using UnityEngine;
 
-/// <summary>
-/// Animation Event helper to trigger footstep SFX without stacking.
-/// Place this on the same GameObject that receives the animation events.
-/// </summary>
 public class PlayFootstep : MonoBehaviour
 {
     [Header("Footstep Settings")]
@@ -21,10 +17,6 @@ public class PlayFootstep : MonoBehaviour
         SoundManager.PlaySound(sound, volume, overlap);
     }
 
-    /// <summary>
-    /// Optional Animation Event that passes a float volume (0..1).
-    /// In your clip's event, set Function = PlaySoundWithVolume and provide a float.
-    /// </summary>
     public void PlaySoundWithVolume(float v)
     {
         SoundManager.PlaySound(sound, Mathf.Clamp01(v), overlap);

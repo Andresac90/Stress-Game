@@ -2,17 +2,13 @@
 using UnityEngine;
 using System;
 
-/// <summary>
-/// Simple kinematic hook projectile. Flies forward until it hits an IHookable
-/// or exceeds max travel distance. When it latches, it STOPS at the hit point
-/// and remains visible until explicitly canceled (so the player can reel in).
-/// </summary>
+//Simple kinematic hook projectile. Flies forward until it hits an IHookable
+//or exceeds max travel distance. When it latches, it STOPS at the hit point
+//and remains visible until explicitly canceled
 [RequireComponent(typeof(Collider2D))]
 public class GrapplingHook2D : MonoBehaviour
 {
-    /// <summary>Raised when the hook latches onto a surface.</summary>
     public event Action<Vector2> OnHookHit;
-    /// <summary>Raised when the hook ends (miss, timeout, or cancel).</summary>
     public event Action OnEnded;
 
     [Header("Latch Behavior")]
@@ -25,14 +21,12 @@ public class GrapplingHook2D : MonoBehaviour
     private float speed;
     private float maxDistance;
     private Vector2 startPos;
-    private bool isLatched; // NEW: stops movement but keeps visual active
+    private bool isLatched; // stops movement but keeps visual active
     private bool hasEnded;
 
     private Collider2D col;
 
-    /// <summary>
-    /// Initialize and launch the hook. Called by the pool user.
-    /// </summary>
+    //Initialize and launch the hook. Called by the pool user
     public void Initialize(Vector2 dir, float spd, float maxDist)
     {
         if (!col) col = GetComponent<Collider2D>();
@@ -75,19 +69,14 @@ public class GrapplingHook2D : MonoBehaviour
         hookable.OnHooked(hitPoint);
         OnHookHit?.Invoke(hitPoint);
 
-        // Optional: stick to the platform so the hook moves with it.
         if (parentToHit)
             transform.SetParent(other.transform, true); // keep world position
 
         if (disableColliderWhenLatched && col)
             col.enabled = false;
-
-        // IMPORTANT: we DO NOT EndHook() here so the visual remains until cancel.
     }
 
-    /// <summary>
-    /// Cancels or completes the hook and returns it to the pool.
-    /// </summary>
+    //Cancels or completes the hook and returns it to the pool
     public void Cancel() => EndHook();
 
     private void EndHook()

@@ -2,21 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// Tiny global SFX helper. Maps <see cref="SoundType"/> enum to clips and
-/// plays them with optional overlap policies (Poly, Cut, SkipIfPlaying).
-/// Keep clip order in the Inspector matched to the SoundType enum order.
-/// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(AudioSource))]
 public class SoundManager : MonoBehaviour
 {
-    /// <summary>
-    /// How to handle multiple plays of the same sound.
-    /// Poly: allow overlap (PlayOneShot).
-    /// Cut:  stop any existing voice for that sound and play the new one.
-    /// SkipIfPlaying: do nothing if that sound is already playing.
-    /// </summary>
     public enum SoundOverlap { Poly, Cut, SkipIfPlaying }
 
     [Header("Configuration")]
@@ -31,7 +20,7 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private bool force2D = true;
 
     private static SoundManager instance;
-    private AudioSource oneShotSource; // used for Poly (PlayOneShot)
+    private AudioSource oneShotSource;
 
     // Dedicated voices for Cut / SkipIfPlaying so we can control a sound per type
     private readonly Dictionary<SoundType, AudioSource> voices =
@@ -52,15 +41,9 @@ public class SoundManager : MonoBehaviour
         if (force2D) oneShotSource.spatialBlend = 0f; // 2D for consistent timing
     }
 
-    /// <summary>
-    /// Backward-compatible API. Uses Poly (overlap allowed).
-    /// </summary>
     public static void PlaySound(SoundType sound, float volume = 1f)
         => PlaySound(sound, volume, SoundOverlap.Poly);
 
-    /// <summary>
-    /// Plays a sound using the provided overlap policy.
-    /// </summary>
     public static void PlaySound(SoundType sound, float volume, SoundOverlap overlap)
     {
         if (instance == null || instance.soundList == null) return;
@@ -102,14 +85,12 @@ public class SoundManager : MonoBehaviour
         }
     }
 
-    /// <summary>Stops a specific sound if it has a dedicated voice.</summary>
     public static void StopSound(SoundType sound)
     {
         if (instance == null) return;
         if (instance.voices.TryGetValue(sound, out var v) && v) v.Stop();
     }
 
-    /// <summary>Stops all dedicated voices (Cut/SkipIfPlaying sounds).</summary>
     public static void StopAll()
     {
         if (instance == null) return;
@@ -117,14 +98,12 @@ public class SoundManager : MonoBehaviour
             if (kvp.Value) kvp.Value.Stop();
     }
 
-    /// <summary>Set master SFX volume (0..1).</summary>
     public static void SetMasterVolume(float v)
     {
         if (instance == null) return;
         instance.masterVolume = Mathf.Clamp01(v);
     }
 
-    /// <summary>Enable/disable 2D forcing for all sources (applies to future voices).</summary>
     public static void SetForce2D(bool enabled)
     {
         if (instance == null) return;
@@ -134,7 +113,6 @@ public class SoundManager : MonoBehaviour
             if (v) v.spatialBlend = enabled ? 0f : v.spatialBlend;
     }
 
-    // --- Internals ---
 
     private AudioSource EnsureVoice(SoundType type)
     {

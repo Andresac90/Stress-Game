@@ -2,11 +2,19 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-//Simple UI bridge for menu buttons.
 public class UIManager : MonoBehaviour
 {
-    public void StartGameButtonClicked()
+    public void StartButtonClicked()
     {
-        SceneManager.LoadScene("Test_PlayerMovement");
+        SceneManager.LoadScene("Level1");
+    }
+
+    public void QuitButtonClicked()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false; 
+#else
+        Application.Quit(); // Quit the app in a build
+#endif
     }
 }

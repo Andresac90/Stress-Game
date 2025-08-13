@@ -1,7 +1,7 @@
 // AirborneState.cs
 using UnityEngine;
 
-//Player locomotion state while not grounded
+//Player motion state while not grounded
 public class AirborneState : IPlayerState
 {
     private PlayerController2D player;
